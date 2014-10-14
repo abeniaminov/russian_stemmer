@@ -27,7 +27,9 @@
 %% FROM,  OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR
 %% OTHER DEALINGS IN THE SOFTWARE.
 %% 
-
+%% 
+%% http://snowball.tartarus.org/algorithms/russian/stemmer.html 
+%%
 
 
 -module(russian_stemmer).
@@ -179,6 +181,18 @@
 
 -define(SOFT_SIGN, [<<"ь"/utf8>>]).
 
+
+%%
+%%  Every step described as the sequence of rules
+%%  Rule is tuple where 
+%%  1-st - list of suffixes
+%%  2-nd - type of suufixes; type1 - founded suffix should be removed without first letter
+%%                           type2 - suffix should be removed entirely
+%%  3-rd  - what should be done when the suffix was found
+%%  4-th - region of search: RV or R2
+%%  
+%%
+
 -define(STEP1,
         [
           {?PERFECTIVE_GERUND_GROUP1, type1, if_removed_then_end, rv}, 
@@ -328,8 +342,9 @@ remove_suffix(_ListSuffix, _GroupType, r2, WordR, RV, 0) ->
 
 remove_suffix(ListSuffix, GroupType, Region, WordR, RV, R2) ->
     RSuffix = find_next_suffix(WordR, ListSuffix),
-    if RSuffix =:= not_found -> {WordR, RV, R2, false};
-      true ->
+    case RSuffix of
+      not_found -> {WordR, RV, R2, false};
+      _ ->
         {Suffix, RListSuffix} = RSuffix,
         SuffixLn = length(Suffix),
         SuffixLnV = if GroupType =:= type1 -> SuffixLn - 1;
