@@ -1,0 +1,12 @@
+{application, russian_stemmer,
+ [
+  {description, "Russian language Implementation of Porter Stemming Algorithm in Erlang"},
+  {vsn, "0.0.1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { russian_stemmer_app, []}},
+  {env, []}
+ ]}.
